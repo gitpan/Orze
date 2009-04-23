@@ -1,0 +1,5 @@
+<ul id="menu">
+[% FOREACH entry = menu %]
+<li><a href="[% entry.url %]">[% entry.title %]</a></li>
+[% END %]
+</ul>
