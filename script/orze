@@ -8,7 +8,7 @@ use Getopt::Long;
 use File::Basename;
 use XML::Twig;
 
-use Orze::Modules;
+use Orze;
 
 =encoding utf8
 
@@ -34,17 +34,21 @@ orze [options] project.xml
 
 # default values for command line
 my %options = (
-               version => 0,
-               pub => 1,
-               help => 0,
-               );
+    version => 0,
+    pub => 1,
+    help => 0,
+    without => [],
+    );
 
 # parsing command line
 GetOptions(\%options, qw(
                          version
                          pub!
                          help|h
+                         without=s@
                          ));
+my @without = split(/,/, join(',', @{$options{without}}));
+$options{without} = \@without;
 
 pod2usage({
     -exitval => 1,
@@ -73,17 +77,6 @@ if (!$suffix) {
 # add script directory to @INC in order to load custom modules
 push @INC, $directory . "/scripts";
 
-# default value for attributes
-my %defaults = (
-                driver => "Template",
-                template => "index",
-                inmenu => 1,
-                extension => "html",
-                pubmode => "g+rX",
-                pubgroup => "www-data",
-                outputdir => "",
-                );
-
 # load xml project file
 my $project = XML::Twig->new(
                             keep_encoding => 1
@@ -91,153 +84,7 @@ my $project = XML::Twig->new(
     ->parsefile($directory . $appname . $suffix);
 $project->set_pretty_print('indented');
 
-my $site = {
-    pages => {},
-    variables => {},
-};
-
 ###########################################################################
-sub propagate {
-    my ($page, $path) = @_;
-    my $parent = $page->parent;
-
-    if (defined($parent)) {
-        print "Reading " . $path . $page->att('name') . "\n";
-        foreach (keys %{$parent->{'att'}}) {
-            if (!defined($page->att($_))) {
-                $page->set_att($_ => $parent->att($_));
-            }
-        }
-
-        my %vars = ();
-        foreach ($page->children('var')) {
-            $vars{$_->att('name')} = 1;
-        }
-
-        foreach ($page->parent->children('var')) {
-            if (!exists($vars{$_->att('name')})) {
-                my $var = $_->copy;
-                $var->paste(first_child => $page);
-            }
-        }
-    }
-    else {
-        foreach (keys %defaults) {
-            if (!defined($page->att($_))) {
-                $page->set_att($_ => $defaults{$_});
-            }
-        }
-    }
-
-    $page->set_att(path => $path);
-    foreach ($page->children('page')) {
-        my $newpath = "";
-        if (defined($parent)) {
-            $newpath = $path . $page->att('name') . "/";
-        }
-        propagate($_, $newpath);
-    }
-}
-
-###########################################################################
-sub evaluate {
-    my ($page, $site) = @_;
-
-    if ($page->parent) {
-        my $path = $page->att('path');
-        my $name = $page->att('name');
-        print "Evaluating in " . $path . $name . "\n";
-    }
-    else {
-        print "Evaluating in /\n";
-    }
-
-    foreach ($page->children('var')) {
-        my $varname = $_->att('name');
-
-        if (defined($_->att('src'))) {
-            my $module_name = $_->att('src');
-            my $module = loadSource($module_name);
-
-            my $source = $module->new($page, $_);
-            $site->{variables}->{$varname} = $source->evaluate();
-        }
-        else {
-            $site->{variables}->{$varname} = $_->text;
-        }
-    }
-
-    foreach ($page->children('page')) {
-        my $name = $_->att('name');
-        $site->{pages}->{$name} = {
-            pages => {},
-            variables => {},
-        };
-        evaluate($_, $site->{pages}->{$name});
-    }
-}
-
-###########################################################################
-sub process {
-    my ($page, $site) = @_;
-
-    if ($page->parent) {
-        my $path = $page->att('path');
-        my $name = $page->att('name');
-
-        my $module_name = $page->att('driver');
-        my $module = loadDriver($module_name);
-
-        my $driver = $module->new($page, $site->{variables});
-
-        print "Processing of " . $path
-            . $name . " with " . $module_name . "\n";
-
-        $driver->process();
-    }
-
-    foreach ($page->children('page')) {
-        my $name = $_->att('name');
-        process($_, $site->{pages}->{$name});
-    }
-}
-
-###########################################################################
-sub scripts {
-    my ($page) = @_;
-
-    if ($page->children('script')) {
-        my $loc;
-        if ($page->parent) {
-            $loc = $page->att('path') . $page->att('name');
-        }
-        else {
-            $loc = "/";
-        }
-        print "Running scripts in ", $loc, "\n";
-    }
-
-    foreach ($page->children('script')) {
-        system $_->text;
-    }
-
-    foreach ($page->children('page')) {
-        scripts($_);
-    }
-}
-
-###########################################################################
-sub post {
-    if ($options{pub}) {
-        system "chgrp " . $defaults{pubgroup} . " -R www/";
-        system "chmod " . $defaults{pubmode} . " -R www/";
-    }
-}
-
-###########################################################################
-propagate($project->root, "");
-evaluate($project->root, $site);
-process($project->root, $site);
-scripts($project->root);
-post();
+my $orze = Orze->new($project, %options);
+$orze->compile;
 

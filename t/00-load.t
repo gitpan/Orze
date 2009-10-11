@@ -1,8 +1,9 @@
 #!perl -T
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 
 BEGIN {
+  use_ok(Orze);
   use_ok(Orze::Modules);
   use_ok(Orze::Drivers::Template);
   use_ok(Orze::Drivers::Llgal);

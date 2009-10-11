@@ -46,26 +46,30 @@ sub evaluate {
     my $options = $page->att('options');
 
     if (-r $file) {
-        my $cmd = "pandoc";
+        my $cmd = 'pandoc';
         if (!$options) {
-            $cmd .= " --reference-links " .
-                "--parse-raw ";
+            $cmd .= ' --reference-links ' .
+                '--parse-raw ';
         }
         if ($from) {
-            $cmd .= " --from " . $from;
+            $cmd .= ' --from ' . $from;
         }
         if ($to) {
-            $cmd .= " --to " . $to;
+            $cmd .= ' --to ' . $to;
         }
-        open PANDOC, $cmd . " " . $file . " |";
-
-        my @lines = <PANDOC>;
-        close PANDOC;
-        my $html = join("", @lines);
-        return $html;
+        my $pandoc;
+        {
+            no warnings;
+            open $pandoc, $cmd . ' ' . $file . ' |'
+                or $self->warning("can't find pandoc");
+            my @lines = <$pandoc>;
+            close $pandoc;
+            my $html = join('', @lines);
+            return $html;
+        }
     }
     else {
-        $self->warning("unable to read file " . $file);
+        $self->warning('unable to read file ' . $file);
     }
 }
 

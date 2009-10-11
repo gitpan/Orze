@@ -1,3 +1,5 @@
+Build.PL
+Changes
 examples/appname/appname.ini
 examples/appname/includes/footer
 examples/appname/includes/header
@@ -26,15 +28,7 @@ examples/orchestre/templates/logos/logoENSL.png
 examples/orchestre/templates/logos/logoENSLSH.png
 examples/orchestre/templates/orchestre-nomenu.css
 examples/orchestre/templates/orchestre.css
-inc/Module/Install.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Scripts.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
+lib/Orze.pm
 lib/Orze/Drivers.pm
 lib/Orze/Drivers/Copy.pm
 lib/Orze/Drivers/Llgal.pm
@@ -52,6 +46,7 @@ lib/Orze/Sources/Pod.pm
 lib/Orze/Sources/YAML.pm
 Makefile.PL
 MANIFEST			This list of files
+META.yml
 script/orze
 t/00-dependencies.t
 t/00-load.t
