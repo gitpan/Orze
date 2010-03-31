@@ -5,6 +5,7 @@ WriteMakefile
           'NAME' => 'Orze',
           'VERSION_FROM' => 'lib/Orze.pm',
           'PREREQ_PM' => {
+                           'Data::Dump' => 0,
                            'DateTime' => 0,
                            'File::Copy::Recursive' => 0,
                            'HTML::Entities' => 0,

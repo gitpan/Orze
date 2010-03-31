@@ -22,6 +22,7 @@ my $builder = Module::Build->new(
         'XML::RSS'              => 0,
         'XML::Twig'             => 0,
         'YAML'                  => 0,
+		  'Data::Dump'            => 0,
     },
     script_files => ['script/orze'],
     create_makefile_pl => 'traditional',

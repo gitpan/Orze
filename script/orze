@@ -18,11 +18,11 @@ Orze - A framework to automate the building of websites
 
 =head1 VERSION
 
-Version 0.32
+Version 1.11
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '1.11';
 
 =head1 SYNOPSIS
 

@@ -1,13 +1,5 @@
 Build.PL
 Changes
-examples/appname/appname.ini
-examples/appname/includes/footer
-examples/appname/includes/header
-examples/appname/includes/menu
-examples/appname/templates/appname.css
-examples/appname/templates/bla1.html
-examples/appname/templates/bla2.html
-examples/appname/templates/index.html
 examples/empty/data/empty.css
 examples/empty/data/index
 examples/empty/empty.xml
@@ -44,11 +36,11 @@ lib/Orze/Sources/Menu.pm
 lib/Orze/Sources/Pandoc.pm
 lib/Orze/Sources/Pod.pm
 lib/Orze/Sources/YAML.pm
-Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.yml
 script/orze
-t/00-dependencies.t
 t/00-load.t
 t/pod-coverage.t
 t/pod.t
+Makefile.PL

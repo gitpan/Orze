@@ -1,6 +1,6 @@
 ---
 name: Orze
-version: 1.0
+version: 1.11
 author:
   - 'Olivier Schwander <iderrick@cpan.org>'
 abstract: Another static website generator
@@ -10,6 +10,7 @@ resources:
 build_requires:
   Test::More: 0
 requires:
+  Data::Dump: 0
   DateTime: 0
   File::Copy::Recursive: 0
   HTML::Entities: 0
@@ -26,7 +27,7 @@ configure_requires:
 provides:
   Orze:
     file: lib/Orze.pm
-    version: 1.0
+    version: 1.11
   Orze::Drivers:
     file: lib/Orze/Drivers.pm
   Orze::Drivers::Copy:

@@ -39,8 +39,7 @@ sub process {
 
     my $page = $self->{page};
 
-    my ($source, $target) = $self->paths($page->att('name'),
-                                         $page->att('extension'));
+    my ($source, $target) = $self->paths($page->att('name'));
     rcopy($source, $target);
 }
 

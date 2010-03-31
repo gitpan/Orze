@@ -6,7 +6,7 @@ Orze - Another static website generator
 
 =head1 VERSION
 
-Version 1.0
+Version 1.11
 
 =head1 DESCRIPTION
 
@@ -21,7 +21,7 @@ use warnings;
 
 use Orze::Modules;
 
-our $VERSION = '1.0';
+our $VERSION = '1.11';
 
 # default value for attributes
 my %defaults = (
@@ -33,6 +33,17 @@ my %defaults = (
                 pubgroup => "www-data",
                 outputdir => "",
                 );
+
+=head2 new
+
+Create a new orze project, given an xml tree and some options.
+
+    my $project = XML::Twig->new->parsefile("project.xml");
+    $project->set_pretty_print('indented');
+    
+    my $orze = Orze->new($project, %options);
+
+=cut
 
 sub new {
     my ($name, $project, %options) = @_;
@@ -51,8 +62,7 @@ sub new {
     return $self;
 }
 
-###########################################################################
-sub propagate {
+sub _propagate {
     my ($self, $page, $path) = @_;
     my $parent = $page->parent;
 
@@ -92,12 +102,11 @@ sub propagate {
         if (defined($parent)) {
             $newpath = $path . $page->att('name') . "/";
         }
-        $self->propagate($_, $newpath);
+        $self->_propagate($_, $newpath);
     }
 }
 
-###########################################################################
-sub evaluate {
+sub _evaluate {
     my ($self, $page, $site) = @_;
 
     if ($page->parent) {
@@ -130,12 +139,11 @@ sub evaluate {
             pages => {},
             variables => {},
         };
-        $self->evaluate($_, $site->{pages}->{$name});
+        $self->_evaluate($_, $site->{pages}->{$name});
     }
 }
 
-###########################################################################
-sub process {
+sub _process {
     my ($self, $page, $site) = @_;
 
     my @without = @{$self->{options}->{without}};
@@ -163,12 +171,11 @@ sub process {
 
     foreach ($page->children('page')) {
         my $name = $_->att('name');
-        $self->process($_, $site->{pages}->{$name}, @without);
+        $self->_process($_, $site->{pages}->{$name}, @without);
     }
 }
 
-###########################################################################
-sub scripts {
+sub _scripts {
     my ($self, $page) = @_;
 
     if ($page->children('script')) {
@@ -187,12 +194,11 @@ sub scripts {
     }
 
     foreach ($page->children('page')) {
-        $self->scripts($_);
+        $self->_scripts($_);
     }
 }
 
-###########################################################################
-sub post {
+sub _post {
     my ($self) = @_;
 
     my $pub = shift;
@@ -202,17 +208,25 @@ sub post {
     }
 }
 
-###########################################################################
+=head2 compile
+
+Build the project.
+
+    my $orze = Orze->new($project, %options);
+    $orze->compile;
+
+=cut
+
 sub compile {
     my ($self) = @_;
 
     my $project = $self->{project};
     my $site = $self->{site};
 
-    $self->propagate($project->root);
-    $self->evaluate($project->root, $site);
-    $self->process($project->root, $site);
-    $self->scripts($project->root);
-    $self->post();
+    $self->_propagate($project->root);
+    $self->_evaluate($project->root, $site);
+    $self->_process($project->root, $site);
+    $self->_scripts($project->root);
+    $self->_post();
 }
 

@@ -3,6 +3,8 @@ package Orze::Sources::Menu;
 use strict;
 use warnings;
 
+use Data::Dump qw(dump);
+
 use base "Orze::Sources";
 
 =head1 NAME
@@ -68,7 +70,7 @@ sub evaluate {
             $base = $page;
         }
         else {
-            $base = $page->field('page[@name="' . $basename . '"]');
+            $base = $page->root->first_child('page[@name="' . $basename . '"]');
         }
     }
 
@@ -115,6 +117,10 @@ sub evaluate {
                         submenu => \@submenu,
                     };
         }
+    }
+
+    if ($var->att('debug')) {
+        print STDERR dump(\@menu);
     }
 
     return \@menu;
